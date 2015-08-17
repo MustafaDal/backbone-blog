@@ -33,6 +33,16 @@
         <script src="../../_assets/main/js/libs/underscore.js"></script>
         <script src="../../_assets/main/js/libs/backbone.js"></script>
         
+        <strong>USERS</strong><br><br>
+        <div id="users"></div>
+        
+        <br><br><br>
+        <strong>POST</strong>
+        <br><br>
+        <div id="posts"></div>
+        <br><br>
+        <div id="result"></div>
+        
         
         <script type="text/javascript">
             /* user model */
@@ -82,20 +92,56 @@
             
             
             /* user view */
-            var UserView = Backbone.View.extend({
-                
+            var UserItemView = Backbone.View.extend({
+                template: _.template( $("#userTemp").html()),
+                initialize: function(){
+                    console.log("UserView is init");
+                    this.render();
+                },
+                render: function(){
+                    this.$el.html(this.template(this.model.toJSON()));
+                }
             });
             
             /* post view */
-            var PostView = Backbone.View.extend({
-                
+            var PostItemView = Backbone.View.extend({
+                template: _.template( $("#postTemp").html() ),
+                initialize: function(){
+                    console.log("PostView is init");
+                    
+                    this.render();
+                },
+                render: function(){
+                    this.$el.html( this.template(this.model.toJSON()) );
+                }
             });
             
-            var user = new User({ ID:5, UserName: "user name", FullName: "full name", Password: "pass word", Eposta: "e-posta"});
-            var users = new Users(user);
+            /* model */
+            var user = new User({ 
+                ID: 5,
+                UserName: "edü", 
+                FullName: "büdü", 
+                Password: "şifrem", 
+                Eposta: "epostam"
+            });
             
-            var post = new Post();
+            var post = new Post({
+                ID: 3,
+                Title: "title test",
+                Content: "title content",
+                Date: "12.12.12",
+                UserID: 0
+            });
+            
+            /* collection */
+            var users = new Users(user);
             var posts = new Posts(post);
+            
+            /* view */
+            var userItemView = new UserItemView({ el: $("#users"), model: user });
+            var postItemView = new PostItemView({ el: $("#posts"), model: post });
+            
+            
         </script>
     </body>
 </html>
