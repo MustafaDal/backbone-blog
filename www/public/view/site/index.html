@@ -55,7 +55,7 @@
                 	"Eposta": ""
                 },
                 initialize: function(){
-                    console.log("User Model is Init");
+                    //console.log("User Model is Init");
                 }
             });
             
@@ -69,16 +69,15 @@
                 	"UserID": 0
                 },
                 initialize: function(){
-                    console.log("Post Model is Init");
+                    //console.log("Post Model is Init");
                 }
             });
-            
             
             /* users collection */
             var Users = Backbone.Collection.extend({
                 Model: User,
                 initialize: function(){
-                    console.log("Users Collecton is Init");
+                    //console.log("Users Collecton is Init");
                 }
             });
             
@@ -86,20 +85,20 @@
             var Posts = Backbone.Collection.extend({
                 Model: Post,
                 initialize: function(){
-                    console.log("Posts Collection is Init");
+                    //console.log("Posts Collection is Init");
                 }
             });
-            
             
             /* user view */
             var UserItemView = Backbone.View.extend({
                 template: _.template( $("#userTemp").html()),
                 initialize: function(){
-                    console.log("UserView is init");
-                    this.render();
+                    //console.log("UserView is init");
+                    //this.render();
                 },
                 render: function(){
-                    this.$el.html(this.template(this.model.toJSON()));
+                    this.$el.html( this.template(this.model.toJSON()) );
+                    return this;
                 }
             });
             
@@ -107,22 +106,76 @@
             var PostItemView = Backbone.View.extend({
                 template: _.template( $("#postTemp").html() ),
                 initialize: function(){
-                    console.log("PostView is init");
-                    
-                    this.render();
+                    //console.log("PostView is init");
+                    //this.render();
                 },
                 render: function(){
                     this.$el.html( this.template(this.model.toJSON()) );
+                    return this;
                 }
             });
+            
+            
+            /* Collection view */
+            
+            /* UserCollectionView */
+            var UserCollectionView = Backbone.View.extend({
+                initialize: function(){
+                    this.renderAll();
+                },
+                render: function(model){
+                    var userItemView = new UserItemView({ model: model });
+                    this.$el.append( userItemView.render().el );
+                },
+                renderAll: function(){
+                    var _this = this;
+                    
+                    _.each(this.collection.models, function(model){
+                        _this.render(model);
+                    });
+                    
+                }
+            });
+            
+            
+            /* Post Collecton View */
+            var PostCollectionView = Backbone.View.extend({
+                initialize: function(){
+                    this.renderAll();
+                },
+                render: function( model ){
+                    var postItemView = new PostItemView({ model: post });
+                    this.$el.append( postItemView.render().el )
+                },
+                renderAll: function(){
+                    var _this = this;
+                    
+                    _.each(this.collection.models, function(model){
+                        _this.render(model);
+                    });
+                }
+            });
+            
+            
+            
+            
+            /* -------------------------------------------------------------***/
             
             /* model */
             var user = new User({ 
                 ID: 5,
-                UserName: "edü", 
-                FullName: "büdü", 
+                UserName: "test", 
+                FullName: "test", 
                 Password: "şifrem", 
                 Eposta: "epostam"
+            });
+            
+            var user2 = new User({ 
+                ID: 2,
+                UserName: "test2", 
+                FullName: "test2", 
+                Password: "şifrem2", 
+                Eposta: "epostam2"
             });
             
             var post = new Post({
@@ -130,16 +183,25 @@
                 Title: "title test",
                 Content: "title content",
                 Date: "12.12.12",
-                UserID: 0
+                UserID: 2
+            });
+            
+            var post2 = new Post({
+                ID: 2,
+                Title: "title test2",
+                Content: "title content2",
+                Date: "24.05.12",
+                UserID: 5
             });
             
             /* collection */
-            var users = new Users(user);
-            var posts = new Posts(post);
+            var users = new Users([ user, user2 ]);
+            var posts = new Posts([ post, post2 ]);
+           
             
-            /* view */
-            var userItemView = new UserItemView({ el: $("#users"), model: user });
-            var postItemView = new PostItemView({ el: $("#posts"), model: post });
+            /* Collection View */
+            var userCollectionView = new UserCollectionView({ el: $("#users"), collection: users });
+            var postCollectionView = new PostCollectionView({ el: $("#posts"), collection: posts });
             
             
         </script>
