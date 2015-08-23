@@ -1,209 +1,243 @@
 ﻿<!DOCTYPE html>
 <html lang="en">
-    <head>
-        <meta charset="UTF-8">
-        <title>My Backbone Tutorials</title>
-        <link href="../../_assets/main/css/normalize.css" rel="stylesheet" />
-        <link href="../../_assets/main/css/main.css" rel="stylesheet" />
-    </head>
-    <body>
-        <!-- user template -->
-        <script type="text/template" id="userTemp">
-            <div>
-                <label>ID         </label> :    <strong><%= ID %>         </strong>
-                <label>User Name  </label> :    <strong><%= UserName %>   </strong>
-                <label>Full Name  </label> :    <strong><%= FullName %>   </strong>
-                <label>Pasword    </label> :    <strong><%= Password %>   </strong>    
-                <label>E-posta    </label> :    <strong><%= Eposta %>     </strong>    
-            </div>
-        </script>
-        
-        <!-- post template -->
-        <script type="text/template" id="postTemp">
-            <div>
-                <label>ID            </label> :           <strong><%= ID %>         </strong>
-                <label>Title         </label> :           <strong><%= Title %>      </strong>
-                <label>Content       </label> :           <strong><%= Content %>    </strong>
-                <label>Date          </label> :           <strong><%= Date %>       </strong>    
-                <label>UserID        </label> :           <strong><%= UserID %>     </strong>    
-            </div>
-        </script>
-            
-        <script src="../../_assets/main/js/libs/jquery-1.11.2.js"></script>
-        <script src="../../_assets/main/js/libs/underscore.js"></script>
-        <script src="../../_assets/main/js/libs/backbone.js"></script>
-        
-        <strong>USERS</strong><br><br>
-        <div id="users"></div>
-        
-        <br><br><br>
-        <strong>POST</strong>
-        <br><br>
-        <div id="posts"></div>
-        <br><br>
-        <div id="result"></div>
-        
-        
-        <script type="text/javascript">
-            /* user model */
-            var User = Backbone.Model.extend({
-                defaults: {
-                	"ID": 0,
-                	"UserName": "",
-                	"FullName": "",
-                	"Password": "",
-                	"Eposta": ""
-                },
-                initialize: function(){
-                    //console.log("User Model is Init");
-                }
-            });
-            
-            /* post model */
-            var Post = Backbone.Model.extend({
-                defaults: {
-                	"ID": 0,
-                	"Title": "",
-                	"Content": "",
-                	"Date": "",
-                	"UserID": 0
-                },
-                initialize: function(){
-                    //console.log("Post Model is Init");
-                }
-            });
-            
-            /* users collection */
-            var Users = Backbone.Collection.extend({
-                Model: User,
-                initialize: function(){
-                    //console.log("Users Collecton is Init");
-                }
-            });
-            
-            /* posts collection */
-            var Posts = Backbone.Collection.extend({
-                Model: Post,
-                initialize: function(){
-                    //console.log("Posts Collection is Init");
-                }
-            });
-            
-            /* user view */
-            var UserItemView = Backbone.View.extend({
-                template: _.template( $("#userTemp").html()),
-                initialize: function(){
-                    //console.log("UserView is init");
-                    //this.render();
-                },
-                render: function(){
-                    this.$el.html( this.template(this.model.toJSON()) );
-                    return this;
-                }
-            });
-            
-            /* post view */
-            var PostItemView = Backbone.View.extend({
-                template: _.template( $("#postTemp").html() ),
-                initialize: function(){
-                    //console.log("PostView is init");
-                    //this.render();
-                },
-                render: function(){
-                    this.$el.html( this.template(this.model.toJSON()) );
-                    return this;
-                }
-            });
-            
-            
-            /* Collection view */
-            
-            /* UserCollectionView */
-            var UserCollectionView = Backbone.View.extend({
-                initialize: function(){
-                    this.renderAll();
-                },
-                render: function(model){
-                    var userItemView = new UserItemView({ model: model });
-                    this.$el.append( userItemView.render().el );
-                },
-                renderAll: function(){
-                    var _this = this;
-                    
-                    _.each(this.collection.models, function(model){
-                        _this.render(model);
+<head>
+    <meta charset="UTF-8">
+    <title>My Backbone Tutorials</title>
+    <link href="../../_assets/main/css/normalize.css" rel="stylesheet" />
+    <!-- Latest compiled and minified CSS -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css">
+    <link href="../../_assets/main/css/main.css" rel="stylesheet" />
+    <!-- Optional theme -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap-theme.min.css">
+</head>
+<body>
+    <script src="../../_assets/main/js/libs/jquery-1.11.2.js"></script>
+    <script src="../../_assets/main/js/libs/underscore.js"></script>
+    <script src="../../_assets/main/js/libs/backbone.js"></script>
+
+    <div class="container">
+        <div class="row">
+            <table class="table">
+                <caption>Optional table caption.</caption>
+                <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>Title</th>
+                        <th>Content</th>
+                        <th>Date</th>
+                        <th>User ID</th>
+                    </tr>
+                </thead>
+                <tbody id="users"></tbody>
+                <tbody id="posts"></tbody>
+            </table>
+        </div>
+    </div>
+
+
+    <!-- TEMPLATES START -->
+    <!-- posts -->
+    <script type="text/template" id="post">
+        <th scope="row"><%= ID %></th>
+        <td>Mark user <%= Title %></td>
+        <td>Otto <%= Content %></td>
+        <td>@mdo <%= Date %></td>
+        <td>@mdo <%= UserID %></td>
+    </script>
+
+    <!-- users -->
+    <script type="text/template" id="user">
+        <th scope="row"><%= ID %></th>
+        <td><%= UserName %></td>
+        <td><%= FullName %></td>
+        <td><%= Password %></td>
+        <td><%= Eposta %></td>
+    </script>
+
+    <!-- TEMPLATE END -->
+
+
+    <script type="text/javascript">
+        /* model start */
+
+        /* user */
+        var User = Backbone.Model.extend({
+            defaults: {
+                ID: "ID",
+                UserName: "UserName",
+                FullName: "FullName",
+                Password: "Password",
+                Eposta: "Eposta"
+            }
+        });
+
+        /* post */
+        var Post = Backbone.Model.extend({
+            defaults: {
+                ID: "ID",
+                Title: "Title",
+                Content: "Content",
+                Date: "Date",
+                UserID: "UserID"
+            }
+        });
+
+        /* model end */
+
+
+        /* collection start */
+
+        /* users */
+        var Users = Backbone.Collection.extend({
+            Model: User
+        });
+
+        /* posts */
+        var Posts = Backbone.Collection.extend({
+            Model: Post
+        });
+
+        /* collection end */
+
+
+        /* view start */
+
+        /* itemView start */
+
+        /* UserItemView */
+        var UserItemView = Backbone.View.extend({
+            template: _.template($("#user").html(), {}),
+            tagName: "tr",
+            render: function () {
+                this.$el.html(this.template(this.model.attributes));
+                return this;
+            }
+        });
+
+        /* PostItemView */
+        var PostItemView = Backbone.View.extend({
+            template: _.template($("#post").html(), {}),
+            tagName: "tr",
+            render: function () {
+                this.$el.html(this.template(this.model.attributes));
+                return this;
+            }
+        });
+
+        /* itemView end */
+
+        /* Collection View Start */
+
+        /* PostCollectionView */
+        var PostCollectionView = Backbone.View.extend({
+            initialize: function () {
+                this.renderAll();
+            },
+            render: function (model) {
+                var postItemView = new PostItemView({ model: model });
+                this.$el.append(postItemView.render().el);
+            },
+            renderAll: function () {
+                var _this = this;
+                _.each(this.collection.models, function (model) {
+                    _this.render(model);
+                });
+            }
+        });
+
+        /* UserCollectionView */
+        var UserCollectionView = Backbone.View.extend({
+            initialize: function () {
+                this.renderAll();
+            },
+            render: function (model) {
+                var userItemView = new UserItemView({ model: model });
+                this.$el.append(userItemView.render().el);
+            },
+            renderAll: function () {
+                var _this = this;
+                _.each(this.collection.models, function (model) {
+                    _this.render(model);
+                });
+            }
+        });
+        /* CollectionViewEnd */
+
+        /* view end */
+
+        /* routers start */
+        var AppRouter = Backbone.Router.extend({
+            routes: {
+                "posts/:id": "getPost",
+                "users": "getAllUsers"
+            },
+            getAllUsers: function () {
+                console.log("getAllUsers");
+                $.ajax({
+                    url: "ajax/user.json",
+                    dataType: "json"
+                }).complete(function (data) {
+                    var users = new Users();
+                    _.each(data.responseJSON, function (models) {
+                        users.add(new User(models));
+                        console.log(models)
                     });
-                    
-                }
-            });
-            
-            
-            /* Post Collecton View */
-            var PostCollectionView = Backbone.View.extend({
-                initialize: function(){
-                    this.renderAll();
-                },
-                render: function( model ){
-                    var postItemView = new PostItemView({ model: post });
-                    this.$el.append( postItemView.render().el )
-                },
-                renderAll: function(){
-                    var _this = this;
-                    
-                    _.each(this.collection.models, function(model){
-                        _this.render(model);
+                    var userCollectionView = new UserCollectionView({ el: $("#users"), collection: users });
+                })
+            },
+            getPost: function ( id ) {
+                console.log("getPost : " + id);
+
+                $.ajax({
+                    url: "ajax/post.json",
+                    dataType: "json"
+                }).complete(function (data) {
+                    var users = new Users();
+                    _.each(data.responseJSON, function (models) {
+                        users.add(new User(models)) ;
+                        if (models.ID == id){
+                            console.log(models);
+                            var postItemView = new PostItemView({ el: $("#posts"), model: users });
+                            console.log(postItemView.render().el);
+                        }
                     });
-                }
+                })
+            }
+
+        });
+        /*
+        $.ajax({
+            url: "ajax/post.json",
+            dataType: "json"
+        }).complete(function (data) {
+            var posts = new Posts();
+            _.each(data.responseJSON, function (models) {
+                posts.add(new Post(models));
+                console.log(models)
+                console.log("ajax complate");
             });
+            var postCollectionView = new PostCollectionView({ el: $("#users"), collection: posts });
+        })
+        */
+        var appROuter = new AppRouter;
+        Backbone.history.start();
+
+        /* routers end */
+
+        /*
+        var user = new User({ ID: 10 });
+        var user2 = new User({ ID: 2 });
+        var users = new Users([user, user2]);
+        var userItemView = new UserItemView({ el: $("#users"), model: user });
+        var userCollectionView = new UserCollectionView({ el: $("#users"), collection: users })
+
             
-            
-            
-            
-            /* -------------------------------------------------------------***/
-            
-            /* model */
-            var user = new User({ 
-                ID: 5,
-                UserName: "test", 
-                FullName: "test", 
-                Password: "şifrem", 
-                Eposta: "epostam"
-            });
-            
-            var user2 = new User({ 
-                ID: 2,
-                UserName: "test2", 
-                FullName: "test2", 
-                Password: "şifrem2", 
-                Eposta: "epostam2"
-            });
-            
-            var post = new Post({
-                ID: 3,
-                Title: "title test",
-                Content: "title content",
-                Date: "12.12.12",
-                UserID: 2
-            });
-            
-            var post2 = new Post({
-                ID: 2,
-                Title: "title test2",
-                Content: "title content2",
-                Date: "24.05.12",
-                UserID: 5
-            });
-            
-            /* collection */
-            var users = new Users([ user, user2 ]);
-            var posts = new Posts([ post, post2 ]);
-           
-            
-            /* Collection View */
-            var userCollectionView = new UserCollectionView({ el: $("#users"), collection: users });
-            var postCollectionView = new PostCollectionView({ el: $("#posts"), collection: posts });
-            
-            
-        </script>
-    </body>
+        var post = new Post();
+        var post2 = new Post({ ID: 777 });
+        var posts = new Posts([post, post2]);
+        var postCollectionView = new PostCollectionView({ el: $("#posts"), collection: posts });
+        */
+
+    </script>
+</body>
 </html>
