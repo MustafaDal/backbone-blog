@@ -18,8 +18,8 @@
     <div class="container">
         <div class="row">
             <table class="table">
-                <caption>Optional table caption.</caption>
-                <thead>
+                <caption><a href="#">posts</a> /// <a href="#/users">users</a></caption>
+                <thead class="posts">
                     <tr>
                         <th>#</th>
                         <th>Title</th>
@@ -28,25 +28,47 @@
                         <th>User ID</th>
                     </tr>
                 </thead>
+                <thead class="users">
+                    <tr>
+                        <th>#</th>
+                        <th>UserName</th>
+                        <th>FullName</th>
+                        <th>Password</th>
+                        <th>Eposta</th>
+                    </tr>
+                </thead>
                 <tbody id="users"></tbody>
                 <tbody id="posts"></tbody>
             </table>
+            
+            <div id="postDetail">
+            </div>   
+            
         </div>
     </div>
 
 
     <!-- TEMPLATES START -->
     <!-- posts -->
-    <script type="text/template" id="post">
+    <script type="text/template" id="postTemp">
         <th scope="row"><%= ID %></th>
         <td>Mark user <%= Title %></td>
         <td>Otto <%= Content %></td>
-        <td>@mdo <%= Date %></td>
-        <td>@mdo <%= UserID %></td>
+        <td><%= Date %></td>
+        <td><a href="#/post/<%= ID %>">Detay</a></td>
+    </script>
+    
+    <!-- post detail -->
+    <script type="text/template" id="postDetailTemp">
+        <div> <strong>ID</strong> : <%= ID %></div>
+        <div> <strong>Title</strong> : <%= Title %></div>
+        <div> <strong>Content</strong> : <%= Content %></div>
+        <div> <strong>Date</strong> : <%= Date %></div>
+        <div> <a href="#">Geri</a> </div>
     </script>
 
     <!-- users -->
-    <script type="text/template" id="user">
+    <script type="text/template" id="userTemp">
         <th scope="row"><%= ID %></th>
         <td><%= UserName %></td>
         <td><%= FullName %></td>
@@ -106,7 +128,7 @@
 
         /* UserItemView */
         var UserItemView = Backbone.View.extend({
-            template: _.template($("#user").html(), {}),
+            template: _.template($("#userTemp").html(), {}),
             tagName: "tr",
             render: function () {
                 this.$el.html(this.template(this.model.attributes));
@@ -116,7 +138,17 @@
 
         /* PostItemView */
         var PostItemView = Backbone.View.extend({
-            template: _.template($("#post").html(), {}),
+            template: _.template($("#postTemp").html(), {}),
+            tagName: "tr",
+            render: function () {
+                this.$el.html(this.template(this.model.attributes));
+                return this;
+            }
+        });
+        
+        /* PostDetailView */
+        var PostDetailView = Backbone.View.extend({
+            template: _.template($("#postDetailTemp").html(), {}),
             tagName: "tr",
             render: function () {
                 this.$el.html(this.template(this.model.attributes));
@@ -161,18 +193,25 @@
                 });
             }
         });
-        /* CollectionViewEnd */
+        /* Collection View End */
 
         /* view end */
 
-        /* routers start */
+        /* appRouter definations */
         var AppRouter = Backbone.Router.extend({
             routes: {
-                "posts/:id": "getPost",
-                "users": "getAllUsers"
+                "" : "getAllPost", // homepage -- tüm post'lar 
+                "post/:id": "getPost", // #/post/id -- gelen id'ye göre post goster
+                "users": "getAllUsers", // #/users -- tüm user'ler
+                "user/:id": "getUser" // #/user/id -- gelen id'ye göre user göster
             },
             getAllUsers: function () {
-                console.log("getAllUsers");
+                /* ajax ile user.json'dan datayı alıp, json'ları model, collection ve collectionview'ı kullanarak ekrana basar */
+                $("#users").empty();
+                $("#postDetail").empty();
+                $(".table thead").hide();
+                $(".table thead.users").show();
+                
                 $.ajax({
                     url: "ajax/user.json",
                     dataType: "json"
@@ -180,63 +219,68 @@
                     var users = new Users();
                     _.each(data.responseJSON, function (models) {
                         users.add(new User(models));
-                        console.log(models)
                     });
                     var userCollectionView = new UserCollectionView({ el: $("#users"), collection: users });
-                })
+                });
             },
-            getPost: function ( id ) {
-                console.log("getPost : " + id);
-
+            getAllPost: function () {
+                $("#users").empty();
+                $("#postDetail").empty();
+                $(".table thead").hide();
+                $(".table thead.posts").show();
+                
                 $.ajax({
                     url: "ajax/post.json",
                     dataType: "json"
                 }).complete(function (data) {
                     var users = new Users();
                     _.each(data.responseJSON, function (models) {
-                        users.add(new User(models)) ;
+                        users.add(new User(models));
+                    });
+                    var postCollectionView = new PostCollectionView({ el: $("#users"), collection: users })
+                });
+            },
+            getPost: function ( id ) {
+                $("#users").empty();
+                $("#postDetail").empty();
+                $(".table thead").hide();
+                    
+                $.ajax({
+                    url: "ajax/post.json",
+                    dataType: "json"
+                }).complete(function (data) {
+                    _.each(data.responseJSON, function (models) {
                         if (models.ID == id){
-                            console.log(models);
-                            var postItemView = new PostItemView({ el: $("#posts"), model: users });
-                            console.log(postItemView.render().el);
+                            var postDetailView = new PostDetailView({ el: $("#postDetail"),  model: new User(models) });
+                            postDetailView.render();
                         }
                     });
-                })
+                });
+            },
+            getUser: function ( id ) {
+                $("#users").empty();
+                $("#postDetail").empty();
+                $(".table thead").hide();
+                $(".table thead.users").show();
+                
+                $.ajax({
+                    url: "ajax/user.json",
+                    dataType: "json"
+                }).complete(function (data) {
+                    _.each(data.responseJSON, function (models) {
+                        if( models.ID == id ){
+                            var userItemView = new UserItemView({ el: $("#users"), model: new User(models) });
+                            $("#users").html("<tr>" + userItemView.render().$el.html() + "</tr>" );
+                        }
+                    });
+                });
             }
-
         });
-        /*
-        $.ajax({
-            url: "ajax/post.json",
-            dataType: "json"
-        }).complete(function (data) {
-            var posts = new Posts();
-            _.each(data.responseJSON, function (models) {
-                posts.add(new Post(models));
-                console.log(models)
-                console.log("ajax complate");
-            });
-            var postCollectionView = new PostCollectionView({ el: $("#users"), collection: posts });
-        })
-        */
+        /* appRouter definations */
+        
+        
         var appROuter = new AppRouter;
         Backbone.history.start();
-
-        /* routers end */
-
-        /*
-        var user = new User({ ID: 10 });
-        var user2 = new User({ ID: 2 });
-        var users = new Users([user, user2]);
-        var userItemView = new UserItemView({ el: $("#users"), model: user });
-        var userCollectionView = new UserCollectionView({ el: $("#users"), collection: users })
-
-            
-        var post = new Post();
-        var post2 = new Post({ ID: 777 });
-        var posts = new Posts([post, post2]);
-        var postCollectionView = new PostCollectionView({ el: $("#posts"), collection: posts });
-        */
 
     </script>
 </body>
