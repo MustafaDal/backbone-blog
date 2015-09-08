@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>My Backbone Tutorials</title>
+    <link href="_assets/main/css/normalize.css" rel="stylesheet" />
+    <!-- Latest compiled and minified CSS -->
+    <link rel="stylesheet" href="_assets/main/css/bootstrap.min.css">
+    <link href="_assets/main/css/main.css" rel="stylesheet" />
+    <!-- Optional theme -->
+    <link rel="stylesheet" href="_assets/main/css/bootstrap-theme.min.css">
+</head>
+<body>
+    <script src="_assets/main/js/libs/jquery-1.11.2.js"></script>
+    <script src="_assets/main/js/libs/underscore.js"></script>
+    <script src="_assets/main/js/libs/backbone.js"></script>
+
+    <div class="container">
+        <div class="row">
+            <table class="table">
+                <caption><a href="#">posts</a> /// <a href="#/users">users</a></caption>
+                <thead class="posts">
+                    <tr>
+                        <th>#</th>
+                        <th>Title</th>
+                        <th>Content</th>
+                        <th>Date</th>
+                        <th>User ID</th>
+                    </tr>
+                </thead>
+                <thead class="users">
+                    <tr>
+                        <th>#</th>
+                        <th>UserName</th>
+                        <th>FullName</th>
+                        <th>Password</th>
+                        <th>Eposta</th>
+                    </tr>
+                </thead>
+                <tbody id="users"></tbody>
+                <tbody id="posts"></tbody>
+            </table>
+            
+            <div id="postDetail">
+            </div>   
+            
+        </div>
+    </div>
+
+
+    <!-- TEMPLATES START -->
+    
+    <!-- posts -->
+    <script type="text/template" id="postTemp">
+        <th scope="row"><%= ID %></th>
+        <td>Mark user <%= Title %></td>
+        <td>Otto <%= Content %></td>
+        <td><%= Date %></td>
+        <td><a href="#/post/<%= ID %>">Detay</a></td>
+    </script>
+    
+    <!-- post detail -->
+    <script type="text/template" id="postDetailTemp">
+        <div> <strong>ID</strong> : <%= ID %></div>
+        <div> <strong>Title</strong> : <%= Title %></div>
+        <div> <strong>Content</strong> : <%= Content %></div>
+        <div> <strong>Date</strong> : <%= Date %></div>
+        <div> <a href="#">Geri</a> </div>
+    </script>
+
+    <!-- users -->
+    <script type="text/template" id="userTemp">
+        <th scope="row"><%= ID %></th>
+        <td><%= UserName %></td>
+        <td><%= FullName %></td>
+        <td><%= Password %></td>
+        <td><%= Eposta %></td>
+    </script>
+
+    <!-- TEMPLATE END -->
+
+        <!-- user -->
+        <script src="_assets/js/app/model/User.js"></script>
+
+        <!-- post -->
+        <script src="_assets/js/app/model/Post.js"></script>
+
+        <!-- UserItemView -->
+        <script src="_assets/js/app/view/UserItemView.js"></script>
+        
+        <!-- PostItemView -->
+        <script src="_assets/js/app/view/PostItemView.js"></script>
+        
+        <!-- PostDetailView -->
+        <script src="_assets/js/app/view/PostDetailView.js"></script>
+
+        <!-- PostCollectionView -->
+		<script src="_assets/js/app/view/PostCollectionView.js"></script>
+
+        <!-- UserCollectionView -->
+		<script src="_assets/js/app/view/UserCollectionView.js"></script>
+
+        <!-- appRouter -->
+        <script src="_assets/js/app/AppRouter.js"></script>
+		
+        
+    <script type="text/javascript">
+        var appROuter = new AppRouter;
+        Backbone.history.start();
+    </script>
+</body>
+</html>
